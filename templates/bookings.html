@@ -1,0 +1,92 @@
+
+
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Получени заявки | Wild Weekend</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+    <main class="section container">
+      <h1>Моите резервации</h1>
+
+        {% if bookings %}
+        <table>
+            <thead>
+                <tr>
+                    <th>№</th>
+                    <th>Оферта</th>
+                    <th>Име</th>
+                    <th>E-mail</th>
+                    <th>Телефон</th>
+                    <th>Цена</th>
+                    <th>Участници</th>
+                    <th>Ниво на физическа подготовка</th>
+                    <th>Предпочитана дата</th>
+                    <th>Бележка</th>
+                    <th>Дата на заявката</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for booking in bookings %}
+                <tr>
+                    <td>{{ booking["id"] }}</td>
+
+                    <td>{{ booking["tour_name"] }}</td>
+
+                    <td>{{ booking["customer_name"] }}</td>
+
+                    <td>{{ booking["email"] }}</td>
+
+                    <td>{{ booking["phone"] or "—" }}</td>
+
+                    <td>{{ "%.0f"|format(booking["price"]) }} лв.</td>
+
+                    <td>{{ booking["participants"] }}</td>
+
+                    <td>
+                        {% if booking["fitness_level"] == "beginner" %}
+                            Начинаещо
+                        {% elif booking["fitness_level"] == "intermediate" %}
+                            Средно
+                        {% elif booking["fitness_level"] == "advanced" %}
+                            Напреднало
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+
+                    <td>{{ booking["preferred_date"] }}</td>
+
+                    <td>{{ booking["notes"] or "—" }}</td>
+
+                    <td>{{ booking["created_at"] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% else %}
+            <p>Все още няма получени заявки.</p>
+        {% endif %}
+
+        <form method="post"
+              action="{{ url_for('clear_bookings') }}">
+            <button type="submit">
+                Изчисти всички заявки
+            </button>
+        </form>
+
+        <p>
+            <a href="{{ url_for('home') }}">
+                Обратно към началната страница
+            </a>
+        </p>
+
+    </main>
+</body>
+</html>

@@ -1,0 +1,144 @@
+
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ tour["name"] }} | Wild Weekend</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container header-inner">
+        <a class="brand" href="{{ url_for('home') }}">Wild Weekend</a>
+        <nav aria-label="Основна навигация">
+            <a href="{{ url_for('home') }}#offers">Оферти</a>
+            <a href="{{ url_for('home') }}#about">За нас</a>
+            <a href="{{ url_for('home') }}#booking">Заявка</a>
+        </nav>
+    </div>
+</header>
+
+<main class="tour-detail-page">
+
+    <a class="back-link" href="{{ url_for('home') }}#offers">
+        ← Обратно към офертите
+    </a>
+
+    <section class="tour-detail-card">
+
+        <div class="tour-detail-image">
+            {% if tour["image_url"] %}
+            <img src="{{ tour['image_url'] }}" alt="{{ tour['name'] }}">
+            {% endif %}
+        </div>
+
+        <div class="tour-detail-content">
+
+            <p class="detail-eyebrow">WILD WEEKEND EXPERIENCE</p>
+
+            <h1>{{ tour["name"] }}</h1>
+
+            <div class="detail-location">
+                <strong>Местоположение:</strong>
+                {{ tour["location"] }}
+            </div>
+
+            <p class="detail-description">
+                {{ tour["description"] }}
+            </p>
+
+            <div class="detail-info">
+                <div>
+                    <span>Цена</span>
+                    <strong>{{ "%.2f"|format(tour["price"]) }} лв. / човек</strong>
+                </div>
+
+                <div>
+                    <span>Капацитет</span>
+                    <strong>{{ tour["capacity"] }} участници</strong>
+                </div>
+            </div>
+
+            <section class="departures-section">
+                <h2>Предстоящи заминавания</h2>
+
+                {% if departures %}
+                    <ul>
+                        {% for departure in departures %}
+                            <li>
+                                <strong>Дата:</strong>
+                                {{ departure["departure_date"] }}
+
+                                <span>
+                                    <strong>Капацитет:</strong>
+                                    {{ departure["capacity"] }} участници
+                                    <br>
+                                    <strong>Свободни места:</strong>
+                                    {{ departure["available"] }} участници
+                                </span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>В момента няма обявени дати за заминаване.</p>
+                {% endif %}
+            </section>
+
+            <section class="map-section">
+                <h2>Местоположение</h2>
+                <p>{{ tour["location"] }}</p>
+
+                {% if tour["map_query"] %}
+                <a
+                    class="map-link"
+                    href="https://www.google.com/maps/search/?api=1&query={{ tour['map_query']|urlencode }}"
+                    target="_blank"
+                    rel="noopener">
+                    Отвори в Google Maps
+                </a>
+                {% endif %}
+            </section>
+
+            <form method="post"
+                  action="{{ url_for('booking_create') }}">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+                <label>Дата
+                    <select name="departure_id" required>
+                        <option value="">-- Изберете --</option>
+                        {% for departure in departures %}
+                        <option value="{{ departure['id'] }}">
+                            {{ departure["departure_date"] }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </label>
+
+                <label>Име
+                    <input name="customer_name" required>
+                </label>
+
+                <label>E-mail
+                    <input name="email" type="email" required>
+                </label>
+
+                <label>Участници
+                    <input name="participants"
+                           type="number"
+                           min="1"
+                           value="1"
+                           required>
+                </label>
+
+                <button type="submit">Изпрати заявка</button>
+            </form>
+
+        </div>
+    </section>
+
+</main>
+
+</body>
+</html>

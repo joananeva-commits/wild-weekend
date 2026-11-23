@@ -1,0 +1,97 @@
+
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Управление на туристическите оферти | Wild Weekend</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+
+    <header class="site-header">
+        <div class="container header-inner">
+            <a class="brand" href="{{ url_for('home') }}">Wild Weekend</a>
+
+            <a href="{{ url_for('home') }}">Начална страница</a>
+
+            <div>
+                <p>
+                    Влезли сте като:
+                    {{ session["username"] }}
+                    ({{ session["role"] }})
+                </p>
+
+                <form method="post" action="{{ url_for('logout') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <button type="submit">Logout</button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <main class="section container">
+        <h1>Управление на туристическите оферти</h1>
+
+        <p class="lead">Списък на туристическите оферти.</p>
+
+        {% if session.get("role") in ["admin", "operator"] %}
+            <p>
+                <a href="{{ url_for('tour_create') }}">Добави нова оферта</a>
+            </p>
+        {% endif %}
+
+        {% if tours %}
+            <div class="bookings-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Код</th>
+                            <th>Име</th>
+                            <th>Място</th>
+                            <th>Цена</th>
+                            <th>Капацитет</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for tour in tours %}
+                            <tr>
+                                <td>{{ tour["code"] }}</td>
+                                <td>{{ tour["name"] }}</td>
+                                <td>{{ tour["location"] }}</td>
+                                <td>{{ tour["price"] }}</td>
+                                <td>{{ tour["capacity"] }}</td>
+                                <td>
+                                    {% if session.get("role") == "admin"
+                                        or (
+                                            session.get("role") == "operator"
+                                            and tour["operator_id"] == session.get("user_id")
+                                        )
+                                    %}
+                                        <a href="{{ url_for('tour_edit', tour_id=tour['id']) }}">
+                                            Редактирай
+                                        </a>
+
+                                        {% if tour["is_active"] %}
+                                            <form method="post"
+                                                  action="{{ url_for('tour_deactivate', tour_id=tour['id']) }}">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                                <button type="submit">Деактивирай</button>
+                                            </form>
+                                        {% endif %}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p>Все още няма добавени туристически оферти.</p>
+        {% endif %}
+    </main>
+
+</body>
+</html>

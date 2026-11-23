@@ -1,0 +1,98 @@
+
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Туристическа оферта | Wild Weekend</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container header-inner">
+        <a class="brand" href="{{ url_for('home') }}">Wild Weekend</a>
+        <a href="{{ url_for('admin_tours') }}">Администрация</a>
+    </div>
+</header>
+
+<main class="section container">
+    <div class="tour-form-wrapper">
+
+        <h1>Нова туристическа оферта</h1>
+        <p class="lead">Попълнете информацията за новото приключение.</p>
+
+        <form method="post" class="tour-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+            <label class="field">Code
+                <input name="code"
+                       value="{{ tour['code'] if tour else '' }}"
+                       required>
+            </label>
+
+            <label class="field">Име
+                <input name="name"
+                       value="{{ tour['name'] if tour else '' }}"
+                       required>
+            </label>
+
+            <label class="field">Място
+                <input name="location"
+                       value="{{ tour['location'] if tour else '' }}"
+                       required>
+            </label>
+
+            <label class="field">Описание
+                <textarea name="description" required>{{ tour["description"] if tour else "" }}</textarea>
+            </label>
+
+            <div class="form-row">
+                <label class="field">Цена
+                    <input name="price" type="number" step="0.01"
+                           value="{{ tour['price'] if tour else '' }}"
+                           required>
+                </label>
+
+                <label class="field">Капацитет
+                    <input name="capacity" type="number" min="1"
+                           value="{{ tour['capacity'] if tour else '' }}"
+                           required>
+                </label>
+            </div>
+
+            <div class="form-row">
+                <label class="field">Latitude
+                    <input name="latitude"
+                           type="number"
+                           step="any"
+                           value="{{ tour['latitude'] if tour and tour['latitude'] is not none else '' }}">
+                </label>
+
+                <label class="field">Longitude
+                    <input name="longitude"
+                           type="number"
+                           step="any"
+                           value="{{ tour['longitude'] if tour and tour['longitude'] is not none else '' }}">
+                </label>
+            </div>
+
+            <label class="field">Google Maps query
+                <input name="map_query"
+                       value="{{ tour['map_query'] if tour else '' }}"
+                       placeholder="напр. Широка лъка, България">
+            </label>
+
+            <label class="field">Image URL
+                <input name="image_url"
+                       value="{{ tour['image_url'] if tour else '' }}">
+            </label>
+
+            <button type="submit">Запази офертата</button>
+
+        </form>
+    </div>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,253 @@
+
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Управление на резервациите | Wild Weekend</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='styles.css') }}">
+
+    <style>
+        .bookings-table {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 12px;
+        }
+
+        .admin-bookings-table {
+            width: 100%;
+            min-width: 1150px;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .admin-bookings-table th {
+            background: #20583f;
+            color: white;
+            padding: 20px 12px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .admin-bookings-table td {
+            padding: 20px 12px;
+            text-align: center;
+            vertical-align: middle;
+            border-bottom: 1px solid #d9e6dd;
+        }
+
+        .admin-bookings-table tbody tr:nth-child(even) {
+            background: #edf5ef;
+        }
+
+        .admin-bookings-table tbody tr:hover {
+            background: #e3efe6;
+        }
+
+        .admin-bookings-table a {
+            color: #20583f;
+            font-weight: 600;
+        }
+
+        .booking-status {
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .admin-action-form {
+            margin: 5px 0;
+        }
+
+        .admin-action-button {
+            width: 130px;
+            padding: 12px 14px;
+            border: none;
+            border-radius: 8px;
+            background: #20583f;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .admin-action-button:hover {
+            background: #17452f;
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="site-header">
+    <div class="container header-inner">
+        <a class="brand" href="{{ url_for('home') }}">Wild Weekend</a>
+
+        <a href="{{ url_for('home') }}">Начална страница</a>
+
+        <div>
+            <p>
+                Влезли сте като:
+                {{ session["username"] }}
+                ({{ session["role"] }})
+            </p>
+
+           <form method="post" action="{{ url_for('logout') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <button type="submit">Logout</button>
+</form>
+        </div>
+    </div>
+</header>
+
+<main class="section container">
+
+    <h1>Управление на резервациите</h1>
+
+    <p class="lead">
+        Списък на всички получени заявки.
+    </p>
+
+    {% if bookings %}
+
+    <div class="bookings-table">
+
+        <table class="admin-bookings-table">
+
+            <thead>
+                <tr>
+                    <th>Тур</th>
+                    <th>Локация</th>
+                    <th>Дата на отпътуване</th>
+                    <th>Клиент</th>
+                    <th>Телефон</th>
+                    <th>Участници</th>
+                    <th>Статус</th>
+                    <th>Карта</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for booking in bookings %}
+
+                <tr>
+
+                    <td>
+                        {{ booking["tour_name"] }}
+                    </td>
+
+                    <td>
+                        {{ booking["location"] }}
+                    </td>
+
+                    <td>
+                        {{ booking["preferred_date"] }}
+                    </td>
+
+                    <td>
+                        {{ booking["customer_name"] }}<br>
+                        <small>{{ booking["email"] }}</small>
+                    </td>
+
+                    <td>
+                        {% if booking["phone"] %}
+                            <a href="tel:{{ booking['phone'] }}">
+                                {{ booking["phone"] }}
+                            </a>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {{ booking["participants"] }}
+                    </td>
+
+                    <td class="booking-status">
+                        {{ booking["status"] }}
+                    </td>
+
+                    <td>
+                        {% if booking["latitude"] is not none
+                              and booking["longitude"] is not none %}
+
+                            <a href="https://www.google.com/maps?q={{ booking['latitude'] }},{{ booking['longitude'] }}"
+                               target="_blank"
+                               rel="noopener">
+                                Виж карта
+                            </a>
+
+                        {% elif booking["map_query"] %}
+
+                            <a href="https://www.google.com/maps/search/?api=1&query={{ booking['map_query']|urlencode }}"
+                               target="_blank"
+                               rel="noopener">
+                                Виж карта
+                            </a>
+
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+
+                    <td>
+
+                        {% if booking["status"] == "PENDING" %}
+
+                          <form class="admin-action-form"
+      method="POST"
+      action="{{ url_for('booking_confirm', booking_id=booking['id']) }}">
+
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+    <button type="submit"
+            class="admin-action-button">
+        Потвърди
+    </button>
+
+</form>
+
+                        {% endif %}
+
+                        {% if booking["status"] != "CANCELLED" %}
+
+                            <form class="admin-action-form"
+                                  method="POST"
+                                  action="{{ url_for('booking_cancel', booking_id=booking['id']) }}">
+<input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                <button type="submit"
+                                        class="admin-action-button">
+                                    Откажи
+                                </button>
+
+                            </form>
+
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    {% else %}
+
+        <p>Все още няма получени заявки.</p>
+
+    {% endif %}
+
+</main>
+
+</body>
+</html>

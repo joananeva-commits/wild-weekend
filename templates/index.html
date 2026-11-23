@@ -1,0 +1,158 @@
+
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1">
+  <title>Wild Weekend</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="#top">Wild Weekend</a>
+    <nav aria-label="Основна навигация">
+      <a href="#offers">Оферти</a>
+      <a href="#about">За нас</a>
+      <a href="#booking">Заявка</a>
+      <a href="{{ url_for('login') }}">Вход</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+  <section class="hero">
+    <div class="container hero-content">
+      <p class="eyebrow">Приключения за малки групи</p>
+      <h1>Wild Weekend – приключения без граници</h1>
+      <p>Бягство от ежедневието с природа, адреналин и незабравими преживявания.</p>
+      <a class="button" href="#offers">Разгледай офертите</a>
+    </div>
+  </section>
+
+  <section id="offers" class="section container">
+    <h2>Нашите предложения</h2>
+    <p class="lead">Изберете преживяване и изпратете заявка.</p>
+
+    <div class="cards">
+      {% for tour in tours %}
+      <article class="card">
+
+        {% if tour["image_url"] %}
+          <img src="{{ tour['image_url'] }}"
+               alt="{{ tour['name'] }}">
+        {% endif %}
+
+        <div class="card-body">
+          <h3>{{ tour["name"] }}</h3>
+
+          <p>{{ tour["location"] }}</p>
+
+          <p>{{ tour["description"] }}</p>
+
+          <p class="price">
+            {{ "%.2f"|format(tour["price"]) }} лв. / човек
+          </p>
+
+          <a href="{{ url_for('tour_detail', tour_id=tour['id']) }}">
+    Виж подробности
+</a>
+        </div>
+
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section id="about" class="section section-soft">
+    <div class="container narrow">
+      <h2>Защо „Wild Weekend“?</h2>
+      <p>Работим с малки групи, местни партньори и ясни правила за безопасност.</p>
+    </div>
+  </section>
+
+  <section id="booking" class="section container narrow">
+    <h2>Изпрати заявка</h2>
+
+    <form id="booking-form" method="post" action="{{ url_for('booking') }}">
+<input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <div class="field">
+        <label for="name">Име</label>
+        <input id="name" name="customer_name" type="text" required>
+      </div>
+
+      <div class="field">
+        <label for="email">E-mail</label>
+        <input id="email" name="email" type="email" required>
+      </div>
+
+      <div class="field">
+        <label for="phone">Телефон</label>
+        <input id="phone" name="phone" type="tel" required>
+      </div>
+
+      <div class="field">
+        <label for="tour">Избрана оферта</label>
+        <select id="tour" name="tour_id" required>
+          <option value="">-- Изберете --</option>
+          {% for tour in tours %}
+          <option value="{{ tour['code'] }}">
+            {{ tour["name"] }} — {{ tour["price"] }} лв.
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="people">Брой участници</label>
+        <input id="people" name="participants" type="number"
+               min="1" max="10" value="2" required>
+      </div>
+
+      <div class="field">
+        <label for="fitness">Ниво на физическа подготовка</label>
+      <select id="fitness" name="fitness_level" required>
+  <option value="">-- Изберете --</option>
+  <option value="beginner">Начинаещо</option>
+  <option value="intermediate">Средно</option>
+  <option value="advanced">Напреднало</option>
+</select>
+      </div>
+
+      <div class="field">
+        <label for="date">Предпочитана дата</label>
+        <input id="date" name="preferred_date" type="date" required>
+      </div>
+
+      <div class="field">
+        <label for="notes">Бележка</label>
+        <textarea id="notes" name="notes" rows="4"></textarea>
+      </div>
+
+      <button class="button" type="submit">Провери заявката</button>
+    </form>
+
+    <div id="booking-result" class="result"
+         role="status" aria-live="polite"></div>
+  </section>
+
+  <section id="saved-requests" class="section container">
+    <h2>Моите учебни заявки</h2>
+    <p>Запазват се само в този браузър на този компютър.</p>
+    <p id="storage-status" role="status"></p>
+    <ul id="request-list"></ul>
+    <button id="clear-requests" type="button">
+      Изтрий всички учебни заявки
+    </button>
+  </section>
+
+</main>
+
+<!--script src="{{ url_for('static', filename='script.js') }}"></script>--
+<script src="script.js"></script>
+
+</body>
+</html>

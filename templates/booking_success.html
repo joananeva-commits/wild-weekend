@@ -1,0 +1,37 @@
+
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Успешно изпратена заявка | Wild Weekend</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+
+<main class="section container" style="max-width: 900px; margin: 50px auto;">
+
+    <h1 style="text-align: center; color: #20583f;">
+        Заявката е изпратена успешно!
+    </h1>
+
+    <p>
+        Благодарим Ви за интереса към нашите природни преживявания.
+    </p>
+
+    <p>
+        Получихме Вашата заявка за резервация.
+        Ще се свържем с Вас за потвърждение.
+    </p>
+
+    <br>
+
+    <a href="{{ url_for('home') }}"
+       style="color: #20583f; font-weight: bold; text-decoration: none;">
+        ← Обратно към началната страница
+    </a>
+
+</main>
+
+</body>
+</html>
